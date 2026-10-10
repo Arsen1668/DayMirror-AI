@@ -1,4 +1,8 @@
-# DayMirror v0.1
+# DayMirror v0.1.2
+
+**Created and maintained by [Arsen1668](https://github.com/Arsen1668).** Product concept and interview design by the project initiator, with AI-assisted implementation.
+
+[Official repository](https://github.com/Arsen1668/DayMirror-AI) · [Design origin](docs/project-origin.md) · [Changelog](CHANGELOG.md) · [Citation](CITATION.cff)
 
 Let AI interview you one question at a time and turn your day into a structured Markdown journal, with progress you can pause and resume.
 
@@ -103,6 +107,14 @@ Unknown metrics remain `null`, rather than being replaced with zero. Mood, energ
 
 v0.2 is planned to add historical statistics, periodic reports, and tracking of suggested actions and their outcomes. v0.1 preserves structured metrics and the original interview context, but does not automatically generate weekly or monthly reports.
 
+## Attribution and citation
+
+If you use or build on DayMirror, please cite the project using [CITATION.cff](CITATION.cff). Citation is appreciated; reuse is governed by the MIT License. The standalone Skill includes its own citation metadata and [provenance notes](daymirror/references/provenance.md).
+
+The design-origin record documents this project's development. It does not claim global first-invention of AI journaling or interview-based reflection. A publication-ready [v0.1.2 release note](docs/releases/v0.1.2.md) is included; preparing it locally does not publish a GitHub Release or register a DOI.
+
 ## License
+
+Copyright (c) 2026 Arsen1668 and DayMirror contributors.
 
 This project is released under the [MIT License](LICENSE). The standalone `daymirror` Skill directory includes the same license.

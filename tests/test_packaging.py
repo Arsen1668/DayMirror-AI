@@ -19,6 +19,7 @@ class PackagingTests(unittest.TestCase):
         self.assertTrue(result["ok"])
         self.assertEqual(result["name"], "daymirror")
         self.assertTrue(result["json_assets_valid"])
+        self.assertTrue(result["citation_metadata_consistent"])
 
     def test_private_canaries_are_excluded_by_allowlist(self):
         work = (ROOT / "work" / "tests").resolve()
@@ -40,6 +41,10 @@ class PackagingTests(unittest.TestCase):
             result = build_release(target)
             with zipfile.ZipFile(result["archive"]) as archive:
                 self.assertEqual(set(archive.namelist()), set(RELEASE_FILES))
+                self.assertEqual(archive.read("CITATION.cff"), archive.read("daymirror/CITATION.cff"))
+                self.assertEqual(archive.read("LICENSE"), archive.read("daymirror/LICENSE"))
+                self.assertIn(b"Arsen1668", archive.read("daymirror/LICENSE"))
+                self.assertIn("daymirror/references/provenance.md", archive.namelist())
                 for name in archive.namelist():
                     self.assertNotIn(canary.encode(), archive.read(name))
             manifest = json.loads(Path(result["manifest"]).read_text(encoding="utf-8"))

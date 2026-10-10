@@ -28,6 +28,17 @@ def validate(skill_root=None):
         raise ValueError("description 必须为 1–1024 字符。")
     if "[TODO:" in content:
         raise ValueError("Skill 存在未完成脚手架。")
+    citation = yaml.safe_load((skill / "CITATION.cff").read_text(encoding="utf-8"))
+    details = metadata["metadata"]
+    if (not isinstance(citation, dict) or citation.get("cff-version") != "1.2.0"
+            or citation.get("version") != details["version"]
+            or citation.get("license") != metadata.get("license")
+            or citation.get("repository-code") != details["repository"]):
+        raise ValueError("引用信息与 Skill 版本、许可证或仓库不一致。")
+    authors = citation.get("authors")
+    if not isinstance(authors, list) or not any(
+            isinstance(author, dict) and author.get("family-names") == details["author"] for author in authors):
+        raise ValueError("引用信息缺少项目作者署名。")
     refs = sorted(set(re.findall(r"(?:references|assets|scripts)/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*", content)))
     for reference in refs:
         target = (skill / reference).resolve()
@@ -48,7 +59,8 @@ def validate(skill_root=None):
     validate_journal(payload, {"content_revision": 0, "questions": [
         {"id": key, "status": "answered" if value is not None else "skipped"}
         for key, value in fixture["answers"].items()]})
-    return {"ok": True, "name": name, "version": metadata["metadata"]["version"], "checked_references": refs, "json_assets_valid": True}
+    return {"ok": True, "name": name, "version": details["version"], "checked_references": refs,
+            "json_assets_valid": True, "citation_metadata_consistent": True}
 
 
 if __name__ == "__main__":

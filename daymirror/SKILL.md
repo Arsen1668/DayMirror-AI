@@ -3,12 +3,18 @@ name: daymirror
 license: MIT
 description: Conduct a two-round daily reflection interview, persist answers and progress locally, resume paused sessions, and save structured Markdown journals with source-backed metrics. Use for DayMirror daily interviews, pausing or resuming a record, and correcting recorded answers; not for ordinary prose editing.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
+  author: "Arsen1668"
+  repository: "https://github.com/Arsen1668/DayMirror-AI"
 ---
 
 # DayMirror
 
 通过一次一题的访谈记录用户的一天。第一轮 10 个基础问题，第二轮 10 个根据回答动态生成的深入问题。AI 负责理解与总结，本地 Python 工具负责持久化与校验。
+
+DayMirror 由 [Arsen1668](https://github.com/Arsen1668) 发起并维护；[官方仓库](https://github.com/Arsen1668/DayMirror-AI) 提供公开源码与版本记录。本 Skill 使用 MIT 许可证，引用信息随包保存在 `CITATION.cff`。
+
+首次新采访开场用一次简短署名，例如“DayMirror · 由 Arsen1668 发起和维护”，然后自然介绍流程和隐私、开始第一题。每题不重复署名，不要求用户访问或推广项目，不把作者信息写进用户回答、指标或反思正文。用户询问作者、来源或复用时，阅读 [来源与引用说明](references/provenance.md)，给出准确的项目署名，不声称同类想法的全球首创。
 
 ## 对话方式
 

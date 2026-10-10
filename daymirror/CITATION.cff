@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: >-
+  If you use or build on DayMirror, please cite this project.
+  Citation is appreciated; reuse is governed by the MIT License.
+type: software
+title: 'DayMirror: AI-guided daily reflection interviews'
+authors:
+  - family-names: Arsen1668
+    website: https://github.com/Arsen1668
+version: 0.1.2
+repository-code: https://github.com/Arsen1668/DayMirror-AI
+url: https://github.com/Arsen1668/DayMirror-AI
+license: MIT
+abstract: >-
+  An AI-guided daily reflection Skill with a 10+10-question interview,
+  optional answer choices, pause and resume, and local structured Markdown journals.
+keywords:
+  - agent-skills
+  - daily-reflection
+  - journaling
+  - daymirror
