@@ -1,34 +1,36 @@
 # DayMirror v0.1
 
-让 AI 逐题采访你，把一天的经历保存为有统一数据结构、可以暂停恢复的 Markdown 日记。
+Let AI interview you one question at a time and turn your day into a structured Markdown journal, with progress you can pause and resume.
 
-本版交付 **10 个基础问题＋10 个动态深入问题**、跳过、暂停、恢复、提前结束、回答修正和日记版本保存。真实采访在支持文件读写和脚本执行的 AI 客户端中进行；Python 负责本地保存与校验，无需 API 密钥。
+This release includes **10 basic questions + 10 dynamically generated follow-up questions**, skipping, pausing, resuming, ending early, correcting answers, and versioned journal exports. Real interviews run in an AI client with file access and Python execution. Python handles local storage and validation and requires no API key.
 
-## 快速安装（Codex）
+The Skill instructions, reference documents, and sample journal are currently written in Chinese. This README is in English.
 
-将下面整段指令复制到支持文件读写和 Python 执行的 Codex 对话中。安装器会从 GitHub 获取完整的 `daymirror` 目录，包含 Skill 指令、脚本、模板和参考文档。
+## Quick installation (Codex)
 
-```text
-$skill-installer 请安装 https://github.com/Arsen1668/DayMirror-AI/tree/main/daymirror 中的 DayMirror Skill。
-检查 Python 3.10+，使用运行该 Skill 脚本的同一个 Python 安装其 requirements.txt 中的依赖。
-运行该 Skill 的 demo 命令，验证合成记录的“采访 → 暂停 → 恢复 → 保存”流程。
-完成后报告实际安装路径、验证结果和启动方式。
-```
-
-安装完成后，在下一轮对话中发送：
+Copy the entire prompt below into a Codex conversation with file read/write access and Python execution. The installer downloads the complete `daymirror` directory from GitHub, including instructions, scripts, templates, and reference documents.
 
 ```text
-$daymirror 请开始今天的反思采访。
-先让我选择日记工作空间的绝对路径和 IANA 时区，然后按流程每次只问一题，完成后自动保存日记。
+$skill-installer Install the DayMirror Skill from https://github.com/Arsen1668/DayMirror-AI/tree/main/daymirror.
+Check that Python 3.10+ is available. Use the same Python interpreter that will run the Skill scripts to install the dependencies in the Skill's requirements.txt.
+Run the Skill's demo command to verify the synthetic interview → pause → resume → save workflow.
+Report the actual installation path, verification results, and how to start using the Skill.
 ```
 
-如果安装后未显示 Skill，重启 Codex 再试。Codex 支持从其他 GitHub 仓库安装 Skill，详见 [官方安装说明](https://learn.chatgpt.com/docs/build-skills#install-curated-skills-for-local-use)。Python 依赖为 PyYAML 和 tzdata；本地脚本无需 API 密钥。
+Once installation is complete, send this in your next turn:
 
-其他 Agent 需要支持 Agent Skills、文件读写和 Python 执行，使用其对应的 Skill 安装入口；本版尚未逐一验证其他客户端。
+```text
+$daymirror Start today's reflection interview.
+First ask me to choose an absolute path for my journal workspace and an IANA time zone. Then ask one question at a time and save the journal automatically when the interview is complete.
+```
 
-## 快速演示
+If the Skill does not appear after installation, restart Codex and try again. Codex can install Skills from other GitHub repositories; see the [official installation guide](https://learn.chatgpt.com/docs/build-skills#install-curated-skills-for-local-use). The Python dependencies are PyYAML and tzdata. The local scripts require no API key.
 
-先将仓库克隆或解压到自己的目录。在 PowerShell 中进入仓库根目录并安装依赖，再运行演示（将 `YOUR_CLONE_DIRECTORY` 替换成实际路径）：
+Other agents need Agent Skills support, file read/write access, and Python execution. Use the installation method provided by your client. Other clients have not yet been individually tested.
+
+## Quick demo
+
+Clone or extract the repository into a directory of your choice. In PowerShell, enter the repository root, install the dependencies, and run the demo. Replace `YOUR_CLONE_DIRECTORY` with the actual path:
 
 ```powershell
 Set-Location 'YOUR_CLONE_DIRECTORY'
@@ -36,38 +38,37 @@ python -m pip install -r requirements.txt
 python -X utf8 daymirror/scripts/daymirror.py demo
 ```
 
-命令使用明确标记的合成问答：回答 3 题 → 暂停并退出进程 → 新进程从第 4 题恢复 → 完成两轮 → 保存日记。输出中的 journal_path 是生成文件的绝对路径。每次演示使用 work/demo 中的新目录。
+The command uses clearly marked synthetic questions and answers: answer 3 questions → pause and exit the process → resume at question 4 in a new process → finish both rounds → save the journal. The `journal_path` in the output is the absolute path to the generated file. Each demo uses a new directory under `work/demo`.
 
-离线演示验证存储流程。真实的深入问题和总结由 AI 根据你的回答生成，演示题目不是固定访谈题库。
+The offline demo verifies the storage workflow. During a real interview, AI generates follow-up questions and summaries from your answers. The demo questions are not a fixed interview question bank.
 
-也可直接查看 [已生成的合成日记](daymirror/assets/example-journal.md) 与 [本地验收记录](docs/verification.md)。
+You can also read the [synthetic sample journal](daymirror/assets/example-journal.md) and [local verification report](docs/verification.md).
 
-## 开始真实采访
+## Start a real interview
 
-向有本地文件权限的 AI 客户端发送以下指令，先把 `YOUR_SKILL_PATH` 替换成仓库内 `daymirror/SKILL.md` 的绝对路径，把 `YOUR_WORKSPACE` 替换成自己选择的私密数据目录。时区 `Asia/Shanghai` 是示例，可换成自己的 IANA 时区：
+Send the prompt below to an AI client with local file access and Python execution. Replace `YOUR_SKILL_PATH` with the absolute path to `daymirror/SKILL.md` in the repository, and replace `YOUR_WORKSPACE` with a private data directory of your choice. `Asia/Shanghai` is an example; use your own IANA time zone.
 
 ```text
-请读取 YOUR_SKILL_PATH，
-按照 DayMirror 流程逐题采访我，记录今天。
-工作空间使用 YOUR_WORKSPACE，
-时区为 Asia/Shanghai。每次只问一题，完成后自动保存日记。
+Read YOUR_SKILL_PATH and follow the DayMirror workflow to interview me about today.
+Use YOUR_WORKSPACE as the workspace and Asia/Shanghai as the time zone.
+Ask one question at a time and save the journal automatically when the interview is complete.
 ```
 
-这是直接读取 Skill 的试用方式。若客户端支持安装 Agent Skills，可将 daymirror 文件夹安装到其技能目录；在 Codex 中可调用 `$daymirror`，其他客户端使用各自的调用方式。
+This lets you try the Skill by reading its instructions directly. If your client supports Agent Skills installation, install the `daymirror` folder in its skills directory. In Codex, invoke it with `$daymirror`; other clients use their own invocation methods.
 
-采访中可说“跳过”“暂停”“继续”“今天先到这里，保存已有内容”“修改第 3 题”。恢复时给客户端原工作空间和会话编号；没有编号时工具优先选择最近未完成记录。
+During the interview, you can say "skip", "pause", "continue", "stop here and save what we have", or "change my answer to question 3". To resume, provide the original workspace and session ID. Without an ID, the tool prioritizes the most recent unfinished session.
 
-正常完成后自动保存。仅说“暂停”会保留可恢复草稿；明确提前结束会生成未完成日记。修改已保存回答时生成新版，保留旧文件。
+A completed interview is saved automatically. Pausing keeps a recoverable draft. Ending early creates a journal marked as incomplete, which you can continue later. Correcting an exported answer creates a new journal version and keeps the previous file.
 
-## 依赖与验证
+## Dependencies and verification
 
-需要 Python 3.10+、PyYAML 6.x 和 tzdata。缺少依赖时运行：
+Requires Python 3.10+, PyYAML 6.x, and tzdata. To install missing dependencies from the repository root:
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
 
-运行测试与文件校验：
+Run the tests, validate the Skill, and build the release package:
 
 ```powershell
 python -X utf8 -m unittest discover -s tests -v
@@ -75,27 +76,27 @@ python -X utf8 tools/validate_skill.py
 python -X utf8 tools/package_release.py
 ```
 
-最后一条只创建本地分发 ZIP 和清单，不上传 GitHub。打包采用固定白名单；真实数据目录、运行数据和临时文件不会进入分发包。
+The last command creates a local distribution ZIP and file manifest. It does not upload to GitHub. Packaging uses a fixed allowlist that excludes personal records, runtime data, and temporary files.
 
-已实测：Windows、Python 3.10.9、PyYAML 6.0.3。代码按跨平台方式组织，其他操作系统和不同 AI 客户端尚未实机验证。
+Tested on Windows with Python 3.10.9 and PyYAML 6.0.3. The code is organized for portability, but other operating systems and AI clients have not been tested in practice.
 
-## 数据与隐私
+## Data and privacy
 
-默认数据在 private/workspace：sessions 保存 JSON 问答和进度，journals 保存版本化 Markdown，inputs 保存私密命令输入。
+When running from the repository, the default workspace is `private/workspace`: `sessions` stores JSON answers and progress, `journals` stores versioned Markdown files, and `inputs` stores private command inputs. For an installed Skill, explicitly choose a data workspace.
 
-未知指标为 null，不用 0 代替。情绪、精力和压力只来自用户明确评分；每个非空指标引用来源问题。正文区分用户自述、主观感受和待验证的 AI 假设，建议也不会记成已执行行为。
+Unknown metrics remain `null`, rather than being replaced with zero. Mood, energy, and stress scores come only from explicit user ratings. Every non-null metric references its source question. Journal entries distinguish user-reported facts, subjective assessments, and unverified AI hypotheses. Suggested actions are not recorded as actions already taken.
 
-**本地存储与本地推理是两回事。** Python 工具不联网；AI 客户端仍可能把回答和读取的文件发送给模型服务。文件为明文。详见 [隐私说明](daymirror/references/privacy.md)。
+**Local storage and local inference are separate.** The Python tools do not connect to the network. Your AI client may still send conversations and file contents to its model provider. Records are stored as plain text. See the [privacy notes](daymirror/references/privacy.md).
 
-## 进一步阅读
+## Further reading
 
-- [v0.1 需求与验收](docs/v0.1-requirements.md)
-- [Skill 工作流](daymirror/SKILL.md)
-- [命令与数据接口](daymirror/references/schema.md)
-- [访谈协议](daymirror/references/interview.md)
+- [v0.1 requirements and acceptance criteria](docs/v0.1-requirements.md)
+- [Skill workflow](daymirror/SKILL.md)
+- [Command and data interfaces](daymirror/references/schema.md)
+- [Interview protocol](daymirror/references/interview.md)
 
-v0.2 将实现历史统计、周期报告和建议效果追踪。v0.1 已保留结构化指标与原始上下文，不自动生成周报或月报。
+v0.2 is planned to add historical statistics, periodic reports, and tracking of suggested actions and their outcomes. v0.1 preserves structured metrics and the original interview context, but does not automatically generate weekly or monthly reports.
 
-## 许可证
+## License
 
-项目采用 [MIT 许可证](LICENSE)。独立分发的 `daymirror` Skill 目录也包含同一许可证。
+This project is released under the [MIT License](LICENSE). The standalone `daymirror` Skill directory includes the same license.
