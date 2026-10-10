@@ -1,0 +1,32 @@
+{
+  "content_revision": 0,
+  "summary": {
+    "overview": null,
+    "events": [],
+    "reflections": [],
+    "learnings": [],
+    "obstacles": [],
+    "actions": []
+  },
+  "metrics": {
+    "sleep_hours": null,
+    "focus_minutes": null,
+    "planned_tasks": null,
+    "completed_tasks": null,
+    "mood": null,
+    "energy": null,
+    "stress": null,
+    "exercise_minutes": null
+  },
+  "metric_sources": {
+    "sleep_hours": [],
+    "focus_minutes": [],
+    "planned_tasks": [],
+    "completed_tasks": [],
+    "mood": [],
+    "energy": [],
+    "stress": [],
+    "exercise_minutes": []
+  },
+  "tags": []
+}

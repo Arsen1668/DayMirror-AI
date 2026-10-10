@@ -1,0 +1,4 @@
+interface:
+  display_name: "DayMirror"
+  short_description: "逐题回顾一天，保存可恢复的问答与结构化日记，让每次反思留下可检验的记录。"
+  default_prompt: "使用 $daymirror 逐题采访我，记录今天，并把日记保存在我选择的工作空间中。"
