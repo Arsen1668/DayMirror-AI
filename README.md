@@ -4,6 +4,28 @@
 
 本版交付 **10 个基础问题＋10 个动态深入问题**、跳过、暂停、恢复、提前结束、回答修正和日记版本保存。真实采访在支持文件读写和脚本执行的 AI 客户端中进行；Python 负责本地保存与校验，无需 API 密钥。
 
+## 快速安装（Codex）
+
+将下面整段指令复制到支持文件读写和 Python 执行的 Codex 对话中。安装器会从 GitHub 获取完整的 `daymirror` 目录，包含 Skill 指令、脚本、模板和参考文档。
+
+```text
+$skill-installer 请安装 https://github.com/Arsen1668/DayMirror-AI/tree/main/daymirror 中的 DayMirror Skill。
+检查 Python 3.10+，使用运行该 Skill 脚本的同一个 Python 安装其 requirements.txt 中的依赖。
+运行该 Skill 的 demo 命令，验证合成记录的“采访 → 暂停 → 恢复 → 保存”流程。
+完成后报告实际安装路径、验证结果和启动方式。
+```
+
+安装完成后，在下一轮对话中发送：
+
+```text
+$daymirror 请开始今天的反思采访。
+先让我选择日记工作空间的绝对路径和 IANA 时区，然后按流程每次只问一题，完成后自动保存日记。
+```
+
+如果安装后未显示 Skill，重启 Codex 再试。Codex 支持从其他 GitHub 仓库安装 Skill，详见 [官方安装说明](https://learn.chatgpt.com/docs/build-skills#install-curated-skills-for-local-use)。Python 依赖为 PyYAML 和 tzdata；本地脚本无需 API 密钥。
+
+其他 Agent 需要支持 Agent Skills、文件读写和 Python 执行，使用其对应的 Skill 安装入口；本版尚未逐一验证其他客户端。
+
 ## 快速演示
 
 先将仓库克隆或解压到自己的目录。在 PowerShell 中进入仓库根目录并安装依赖，再运行演示（将 `YOUR_CLONE_DIRECTORY` 替换成实际路径）：
@@ -31,7 +53,7 @@ python -X utf8 daymirror/scripts/daymirror.py demo
 时区为 Asia/Shanghai。每次只问一题，完成后自动保存日记。
 ```
 
-这是直接读取 Skill 的试用方式。若客户端支持安装 Agent Skills，可将 daymirror 文件夹安装到其技能目录，之后调用 `$daymirror`。本项目不会自行改动客户端配置。
+这是直接读取 Skill 的试用方式。若客户端支持安装 Agent Skills，可将 daymirror 文件夹安装到其技能目录；在 Codex 中可调用 `$daymirror`，其他客户端使用各自的调用方式。
 
 采访中可说“跳过”“暂停”“继续”“今天先到这里，保存已有内容”“修改第 3 题”。恢复时给客户端原工作空间和会话编号；没有编号时工具优先选择最近未完成记录。
 
