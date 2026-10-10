@@ -3,12 +3,21 @@ name: daymirror
 license: MIT
 description: Conduct a two-round daily reflection interview, persist answers and progress locally, resume paused sessions, and save structured Markdown journals with source-backed metrics. Use for DayMirror daily interviews, pausing or resuming a record, and correcting recorded answers; not for ordinary prose editing.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # DayMirror
 
 通过一次一题的访谈记录用户的一天。第一轮 10 个基础问题，第二轮 10 个根据回答动态生成的深入问题。AI 负责理解与总结，本地 Python 工具负责持久化与校验。
+
+## 对话方式
+
+先让用户容易开口，再进入反思。前 5 题从此刻状态、一个小片段、时间去向、一件事的进展和一段专注体验切入，不要求总结整天、列三件大事或一开始填写评分。具体节奏与示例见 [访谈协议](references/interview.md)。
+
+- 每题只有一个核心问题，提供 2–4 个简短、中性的可选方向，同时允许自由回答、不确定、没有相关经历和跳过。选项是表达入口，不是测验；用户直接叙述时不要要求补选字母。
+- 收到回答后用最多一句自然回应接住用户实际说的内容，再进入下一题；短回答无需夸奖或分析，不把疲惫、卡住或没有收获解释成人格问题。
+- 第一轮沿用磁盘中的完整题目和选项，不能临时改写；承接上一题的回应放在问题外，不夹带额外问题。第二轮把承接具体经历的措辞和选项一起写入问题，再保存、展示。
+- 用户只答字母时保存原话，解读时只对应当前题已保存的选项。不能据此补出事件细节、时长、任务数或评分；只有用户明确报数才能填写指标。字母含义有歧义时澄清同一题。
 
 ## 开始前
 
@@ -36,8 +45,8 @@ python -X utf8 <skill-root>/scripts/daymirror.py status --workspace <absolute-wo
 ## 采访循环
 
 1. 用户要求恢复、继续或已有未完成记录时，用 `resume` 读取磁盘问答。新记录用 `start`；用户要求另记一次时可新建会话，同一天的会话不会覆盖彼此。
-2. 第一轮使用工具已保存的固定问题；只向用户展示 `current_question`，不要展示整轮问题列表或工具 JSON。
-3. 第二轮先用 `status` 读取最新问答，再依据相关事件、具体原因和可验证行动生成一个问题。用 `question --input <file>` 保存 `{"question_id":"当前编号","text":"问题"}`，成功后才展示它。已有问题文本必须沿用，恢复时不能换题。
+2. 第一轮使用工具已保存的固定问题和全部选项；只向用户展示 `current_question` 的题目内容，不要展示整轮问题列表或工具 JSON。恢复旧会话也沿用其原题，不用新版题库替换。
+3. 第二轮先用 `status` 读取最新问答，再针对用户提过的一个具体片段生成一个问题与 2–4 个可选方向；避免“为什么效率低”等预设，也不重复已明确回答的细节。用 `question --input <file>` 保存 `{"question_id":"当前编号","text":"完整问题及选项"}`，成功后才展示它。已有问题文本必须沿用，恢复时不能换题或选项。
 4. 用户回答后，用 `answer --input <file>` 保存 `{"question_id":"当前编号","answer":"用户原话"}`。保留原意、换行和不确定表达，不把 AI 理解写成用户回答。保存成功后再问下一题。
 5. 用户跳过时调用 `skip --question <当前编号>`。未提供的答案和指标为空，不替用户补充答案。
 6. `ready_to_save` 为 true 时，不再提问；生成下述日记输入并立即调用 `save`，然后向用户展示简短摘要和实际文件路径。正常完成后无需另问是否保存。

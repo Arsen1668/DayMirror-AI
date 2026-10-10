@@ -163,6 +163,39 @@ class InterviewTests(WorkspaceTest):
         restored = self.engine.resume(self.sid)
         self.assertEqual(restored["current_question"]["number"], 2)
 
+    def test_letter_answer_preserves_choices_and_leaves_metrics_unknown(self):
+        question = self.state["current_question"]["text"]
+        self.engine.answer({"question_id": "q01", "answer": "A"}, self.sid)
+        self.engine.pause(self.sid)
+        restored = Engine(self.workspace).resume(self.sid)
+        recorded = restored["session"]["questions"][0]
+        self.assertEqual(recorded["text"], question)
+        self.assertEqual(recorded["answer"], "A")
+        self.assertEqual(restored["current_question"]["number"], 2)
+        saved = self.engine.save(self.empty_payload(), self.sid)
+        exported = Path(saved["journal_path"]).read_text(encoding="utf-8")
+        self.assertIn(question, exported)
+        self.assertIn("```text\nA\n```", exported)
+        metadata = frontmatter(saved["journal_path"])
+        for metric in TEMPLATE["metrics"]:
+            self.assertIsNone(metadata[metric])
+            self.assertEqual(metadata["metric_sources"][metric], [])
+
+    def test_upgraded_question_bank_does_not_rewrite_existing_session(self):
+        old_questions = [f"旧版基础问题 {number}" for number in range(1, 11)]
+        with patch("daymirror_core.engine.BASIC_QUESTIONS", old_questions):
+            old = self.engine.start("2026-10-10", synthetic=True)
+        old_sid = old["session_id"]
+        self.engine.answer({"question_id": "q01", "answer": "旧版问题的原回答"}, old_sid)
+        self.engine.pause(old_sid)
+        restored = self.cli("resume", "--session", old_sid)["result"]
+        self.assertEqual(restored["current_question"]["text"], old_questions[1])
+        self.assertEqual([q["text"] for q in restored["session"]["questions"][:10]], old_questions)
+        self.assertEqual(restored["session"]["questions"][0]["answer"], "旧版问题的原回答")
+        fresh = self.engine.start("2026-10-10", synthetic=True)
+        self.assertEqual(fresh["current_question"]["text"], self.state["current_question"]["text"])
+        self.assertNotEqual(fresh["current_question"]["text"], old_questions[0])
+
     def test_zero_answers_does_not_create_content(self):
         saved = self.engine.save(self.empty_payload(), self.sid)
         metadata = frontmatter(saved["journal_path"])

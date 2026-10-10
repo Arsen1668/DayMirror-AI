@@ -6,6 +6,12 @@ This release includes **10 basic questions + 10 dynamically generated follow-up 
 
 The Skill instructions, reference documents, and sample journal are currently written in Chinese. This README is in English.
 
+## Interview experience (v0.1.1)
+
+The first five questions ease into the conversation through your current state, one small moment, where your time went, progress on one task, and one period of focus. Each question offers brief, neutral answer choices alongside free-form answers, uncertainty, and skipping. Follow-up questions build on what you have shared and include their own choices.
+
+Selecting a letter is enough to answer. Choices are saved with the question and are never converted into guessed scores or missing facts. New interviews use the updated opening; existing sessions resume with their original questions and answers.
+
 ## Quick installation (Codex)
 
 Copy the entire prompt below into a Codex conversation with file read/write access and Python execution. The installer downloads the complete `daymirror` directory from GitHub, including instructions, scripts, templates, and reference documents.

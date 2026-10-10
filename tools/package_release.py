@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 RELEASE_FILES = (
     ".gitignore", "README.md", "LICENSE", "requirements.txt", "docs/v0.1-requirements.md",
     "daymirror/SKILL.md", "daymirror/LICENSE", "daymirror/requirements.txt", "daymirror/agents/openai.yaml",

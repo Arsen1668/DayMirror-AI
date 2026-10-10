@@ -48,7 +48,7 @@ def validate(skill_root=None):
     validate_journal(payload, {"content_revision": 0, "questions": [
         {"id": key, "status": "answered" if value is not None else "skipped"}
         for key, value in fixture["answers"].items()]})
-    return {"ok": True, "name": name, "version": "0.1.0", "checked_references": refs, "json_assets_valid": True}
+    return {"ok": True, "name": name, "version": metadata["metadata"]["version"], "checked_references": refs, "json_assets_valid": True}
 
 
 if __name__ == "__main__":
