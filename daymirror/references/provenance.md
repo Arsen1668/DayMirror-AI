@@ -8,7 +8,7 @@ DayMirror 项目发起人、产品构思与访谈设计负责人：Arsen1668。�
 
 Skill 的 CITATION.cff 包含项目名称、版本、公开作者署名和官方仓库；仓库根目录也有一份，方便 GitHub 展示引用入口。引用示例：
 
-Arsen1668. DayMirror: AI-guided daily reflection interviews (Version 0.1.2). https://github.com/Arsen1668/DayMirror-AI
+Arsen1668. DayMirror: AI-guided daily reflection interviews (Version 0.1.3). https://github.com/Arsen1668/DayMirror-AI
 
 Arsen1668 是公开账号署名，不推断或披露作者的真实姓名、住址等个人信息。当前未登记 DOI；正式发布日期以 GitHub Release 为准，不把本地开发日期当作已发布日期。
 

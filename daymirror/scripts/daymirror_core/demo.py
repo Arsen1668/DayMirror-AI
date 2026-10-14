@@ -44,7 +44,9 @@ def run_demo(workspace=None):
     state = invoke("start", "--date", fixture["date"], "--synthetic")
     sid = state["session_id"]
     for number in range(1, 4):
+        invoke("question", "--session", sid, payload={"question_id": f"q{number:02d}", "text": fixture["basic_questions"][number - 1]})
         invoke("answer", "--session", sid, payload={"question_id": f"q{number:02d}", "answer": fixture["answers"][f"q{number:02d}"]})
+    invoke("question", "--session", sid, payload={"question_id": "q04", "text": fixture["basic_questions"][3]})
     before = invoke("pause", "--session", sid)
     pause_pid = pids[-1]
     snapshot = invoke("status", "--session", sid)["session"]
@@ -53,8 +55,9 @@ def run_demo(workspace=None):
     if restored["session"]["questions"] != snapshot["questions"] or restored["current_question"]["number"] != 4:
         raise DayMirrorError("demo_failed", "跨进程恢复没有保留原始问题、回答与进度。")
     for number in range(4, 21):
-        if number > 10:
-            invoke("question", "--session", sid, payload={"question_id": f"q{number:02d}", "text": fixture["deep_questions"][number - 11]})
+        if number != 4:
+            question = fixture["basic_questions"][number - 1] if number <= 10 else fixture["deep_questions"][number - 11]
+            invoke("question", "--session", sid, payload={"question_id": f"q{number:02d}", "text": question})
         answer = fixture["answers"][f"q{number:02d}"]
         if answer is None:
             state = invoke("skip", "--session", sid, "--question", f"q{number:02d}")
@@ -70,7 +73,7 @@ def run_demo(workspace=None):
         raise DayMirrorError("demo_failed", "重复保存没有保持幂等。")
     return {
         "synthetic": True,
-        "notice": "离线合成回放验证保存与恢复；真实第二轮问题由 AI 客户端逐题生成。",
+        "notice": "离线合成回放验证保存与恢复；真实两轮问题均由 AI 客户端参考回答逐题生成。",
         "steps": [
             {"phase": "采访", "answered": 3},
             {"phase": "暂停并退出进程", "status": before["status"], "next_question": 4},

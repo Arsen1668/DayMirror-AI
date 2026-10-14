@@ -37,6 +37,7 @@ class WorkspaceTest(unittest.TestCase):
         self.engine.initialize("Asia/Shanghai")
         self.state = self.engine.start("2026-10-10", synthetic=True)
         self.sid = self.state["session_id"]
+        self.state = self.question({"text": FIXTURE["basic_questions"][0]}, self.sid)
 
     def tearDown(self):
         # Check the absolute target before TemporaryDirectory recursively removes it.
@@ -54,11 +55,13 @@ class WorkspaceTest(unittest.TestCase):
 
     def answer(self, payload, session_id=None):
         session_id = session_id or self.sid
+        self.ensure_question(session_id)
         question = self.engine.status(session_id)["current_question"]
         return self.engine.answer({"question_id": question["id"], **payload}, session_id)
 
     def skip(self, session_id=None):
         session_id = session_id or self.sid
+        self.ensure_question(session_id)
         question = self.engine.status(session_id)["current_question"]
         return self.engine.skip(session_id, question["id"])
 
@@ -66,6 +69,13 @@ class WorkspaceTest(unittest.TestCase):
         session_id = session_id or self.sid
         question = self.engine.status(session_id)["current_question"]
         return self.engine.record_question({"question_id": question["id"], **payload}, session_id)
+
+    def ensure_question(self, session_id):
+        question = self.engine.status(session_id)["current_question"]
+        if question and question["text"] is None:
+            number = question["number"]
+            text = FIXTURE["basic_questions"][number - 1] if number <= 10 else FIXTURE["deep_questions"][number - 11]
+            self.engine.record_question({"question_id": question["id"], "text": text}, session_id)
 
     def finish(self):
         for number in range(self.session()["current_question"] or 21, 21):
@@ -82,6 +92,7 @@ class WorkspaceTest(unittest.TestCase):
 
     def cli(self, command, *extra, payload=None, expect=0):
         if command == "answer" and payload is not None and "question_id" not in payload:
+            self.ensure_question(self.sid)
             payload = {"question_id": self.engine.status(self.sid)["current_question"]["id"], **payload}
         invocation = [sys.executable, "-X", "utf8", str(SCRIPTS / "daymirror.py"), command,
                       "--workspace", str(self.workspace), *extra]
@@ -183,9 +194,13 @@ class InterviewTests(WorkspaceTest):
 
     def test_upgraded_question_bank_does_not_rewrite_existing_session(self):
         old_questions = [f"旧版基础问题 {number}" for number in range(1, 11)]
-        with patch("daymirror_core.engine.BASIC_QUESTIONS", old_questions):
-            old = self.engine.start("2026-10-10", synthetic=True)
+        old = self.engine.start("2026-10-10", synthetic=True)
         old_sid = old["session_id"]
+        path = self.workspace / "sessions" / (old_sid + ".json")
+        legacy = read_json(path)
+        for question, text in zip(legacy["questions"], old_questions):
+            question["text"] = text
+        write_json(path, legacy)
         self.engine.answer({"question_id": "q01", "answer": "旧版问题的原回答"}, old_sid)
         self.engine.pause(old_sid)
         restored = self.cli("resume", "--session", old_sid)["result"]
@@ -193,8 +208,43 @@ class InterviewTests(WorkspaceTest):
         self.assertEqual([q["text"] for q in restored["session"]["questions"][:10]], old_questions)
         self.assertEqual(restored["session"]["questions"][0]["answer"], "旧版问题的原回答")
         fresh = self.engine.start("2026-10-10", synthetic=True)
-        self.assertEqual(fresh["current_question"]["text"], self.state["current_question"]["text"])
-        self.assertNotEqual(fresh["current_question"]["text"], old_questions[0])
+        self.assertIsNone(fresh["current_question"]["text"])
+        self.assertEqual(fresh["next_action"], "generate_and_record_question")
+
+    def test_new_session_requires_question_before_first_answer_or_skip(self):
+        fresh = self.engine.start("2026-10-10", synthetic=True)
+        sid = fresh["session_id"]
+        session = self.engine.status(sid)["session"]
+        self.assertTrue(all(q["text"] is None for q in session["questions"]))
+        path = self.workspace / "sessions" / (sid + ".json")
+        before = path.read_bytes()
+        for operation in (
+                lambda: self.engine.answer({"question_id": "q01", "answer": "B"}, sid),
+                lambda: self.engine.skip(sid, "q01")):
+            with self.assertRaises(DayMirrorError) as caught:
+                operation()
+            self.assertEqual(caught.exception.code, "question_not_recorded")
+            self.assertEqual(path.read_bytes(), before)
+
+    def test_basic_questions_are_generated_only_for_current_slot(self):
+        sid = self.engine.start("2026-10-10", synthetic=True)["session_id"]
+        question = {"question_id": "q01", "text": "今天哪一段休息最想留下来？\nA. 清晨\nB. 午后\nC. 晚间\n也可以自己说。"}
+        saved = self.engine.record_question(question, sid)
+        repeated = self.engine.record_question(question, sid)
+        self.assertEqual(saved["revision"], repeated["revision"])
+        with self.assertRaises(DayMirrorError):
+            self.engine.record_question({"question_id": "q02", "text": "提前生成下一题"}, sid)
+        with self.assertRaises(DayMirrorError):
+            self.engine.record_question({"question_id": "q01", "text": "重写已展示的题目"}, sid)
+        self.engine.answer({"question_id": "q01", "answer": "B，午后坐在阳台上。"}, sid)
+        current = self.engine.status(sid)
+        self.assertIsNone(current["current_question"]["text"])
+        self.assertEqual(current["next_action"], "generate_and_record_question")
+        self.engine.record_question({"question_id": "q02", "text": "坐在阳台上的时候，什么让你觉得放松？"}, sid)
+        self.engine.pause(sid)
+        restored = self.cli("resume", "--session", sid)["result"]
+        self.assertEqual(restored["current_question"]["text"], "坐在阳台上的时候，什么让你觉得放松？")
+        self.assertEqual(restored["session"]["questions"][0]["answer"], "B，午后坐在阳台上。")
 
     def test_zero_answers_does_not_create_content(self):
         saved = self.engine.save(self.empty_payload(), self.sid)
@@ -238,7 +288,7 @@ class InterviewTests(WorkspaceTest):
         payload = self.finish()
         first = self.engine.save(payload, self.sid)
         old = Path(first["journal_path"]).read_bytes()
-        self.engine.edit(4, {"answer": "修正：上午连续深度专注60分钟。"}, self.sid)
+        self.engine.edit(5, {"answer": "修正：上午连续深度专注60分钟。"}, self.sid)
         with self.assertRaises(DayMirrorError) as caught:
             self.engine.save(payload, self.sid)
         self.assertEqual(caught.exception.code, "stale_summary")
@@ -360,9 +410,9 @@ class ValidationTests(WorkspaceTest):
         for _ in range(10):
             self.skip(self.sid)
         with self.assertRaises(DayMirrorError):
-            self.answer({"answer": "回答"}, self.sid)
+            self.engine.answer({"question_id": "q11", "answer": "回答"}, self.sid)
         with self.assertRaises(DayMirrorError):
-            self.skip(self.sid)
+            self.engine.skip(self.sid, "q11")
         self.assertEqual(self.session()["current_question"], 11)
 
     def test_paused_session_requires_resume_before_answer(self):

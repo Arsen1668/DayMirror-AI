@@ -7,7 +7,7 @@ from functools import wraps
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from .constants import BASIC_QUESTIONS, SCHEMA_VERSION
+from .constants import SCHEMA_VERSION
 from .errors import DayMirrorError
 from .render import render_journal
 from .storage import atomic_write, read_json, workspace_lock, write_json
@@ -140,7 +140,7 @@ class Engine:
             "status": "active", "revision": 1, "content_revision": 0,
             "current_question": 1, "synthetic": synthetic,
             "questions": [{"id": f"q{n:02d}", "number": n, "round": "basic" if n <= 10 else "deep",
-                           "text": BASIC_QUESTIONS[n - 1] if n <= 10 else None,
+                           "text": None,
                            "status": "pending", "answer": None} for n in range(1, 21)],
             "journal_payload": None, "exports": [],
         }
@@ -172,7 +172,7 @@ class Engine:
         if self._pending(session)["id"] != qid:
             fail("输入题号不是当前题目，请读取最新进度。", "stale_question")
         if any(other["text"] == proposed for other in session["questions"]):
-            fail("深入问题与已有问题完全重复，请生成新的问题。")
+            fail("问题与已有问题完全重复，请生成新的问题。")
         q["text"] = proposed
         self._persist(session, content_changed=True)
         return self._view(session)
@@ -191,7 +191,7 @@ class Engine:
         if q["id"] != qid:
             fail("输入题号不是当前题目；已回答题目的修正请用 edit。", "stale_question")
         if q["text"] is None:
-            fail("请先保存深入问题，再记录回答。", "question_not_recorded")
+            fail("请先保存当前问题，再记录回答。", "question_not_recorded")
         q.update(status="answered", answer=value)
         self._persist(session, content_changed=True)
         return {**self._view(session), "idempotent": False}

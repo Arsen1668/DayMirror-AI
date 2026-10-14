@@ -1,4 +1,4 @@
-# DayMirror v0.1.2
+# DayMirror v0.1.3
 
 **Created and maintained by [Arsen1668](https://github.com/Arsen1668).** Product concept and interview design by the project initiator, with AI-assisted implementation.
 
@@ -6,15 +6,17 @@
 
 Let AI interview you one question at a time and turn your day into a structured Markdown journal, with progress you can pause and resume.
 
-This release includes **10 basic questions + 10 dynamically generated follow-up questions**, skipping, pausing, resuming, ending early, correcting answers, and versioned journal exports. Real interviews run in an AI client with file access and Python execution. Python handles local storage and validation and requires no API key.
+This release includes **two rounds of 10 dynamically generated questions**, skipping, pausing, resuming, ending early, correcting answers, and versioned journal exports. Real interviews run in an AI client with file access and Python execution. Python handles local storage and validation and requires no API key.
 
 The Skill instructions, reference documents, and sample journal are currently written in Chinese. This README is in English.
 
-## Interview experience (v0.1.1)
+## Adaptive interview experience (v0.1.3)
 
-The first five questions ease into the conversation through your current state, one small moment, where your time went, progress on one task, and one period of focus. Each question offers brief, neutral answer choices alongside free-form answers, uncertainty, and skipping. Follow-up questions build on what you have shared and include their own choices.
+Both rounds now generate questions one at a time from your answers. New sessions have no prefilled question bank: the opening uses your current context, and the next question follows a concrete detail in your previous answer. The agent also checks which time periods and life contexts remain unexplored, so reflection can move beyond one task and cover more of your day.
 
-Selecting a letter is enough to answer. Choices are saved with the question and are never converted into guessed scores or missing facts. New interviews use the updated opening; existing sessions resume with their original questions and answers.
+The first three questions offer brief, neutral answer choices to help you start. If you still need support, choices may continue through question five. Later questions use specific, open-ended follow-ups. You can always answer freely, say you are unsure, or skip; no scores or missing facts are guessed from a choice.
+
+The two-round 10+10 progress structure remains. Every question is saved before display, including choices when used. Existing sessions keep their already saved questions and answers; only ungenerated questions use the new approach.
 
 ## Quick installation (Codex)
 
@@ -50,7 +52,7 @@ python -X utf8 daymirror/scripts/daymirror.py demo
 
 The command uses clearly marked synthetic questions and answers: answer 3 questions → pause and exit the process → resume at question 4 in a new process → finish both rounds → save the journal. The `journal_path` in the output is the absolute path to the generated file. Each demo uses a new directory under `work/demo`.
 
-The offline demo verifies the storage workflow. During a real interview, AI generates follow-up questions and summaries from your answers. The demo questions are not a fixed interview question bank.
+The offline demo verifies the storage workflow. During a real interview, AI generates questions in both rounds and summaries from your answers. The demo questions are not a fixed interview question bank.
 
 You can also read the [synthetic sample journal](daymirror/assets/example-journal.md) and [local verification report](docs/verification.md).
 
@@ -111,7 +113,7 @@ v0.2 is planned to add historical statistics, periodic reports, and tracking of 
 
 If you use or build on DayMirror, please cite the project using [CITATION.cff](CITATION.cff). Citation is appreciated; reuse is governed by the MIT License. The standalone Skill includes its own citation metadata and [provenance notes](daymirror/references/provenance.md).
 
-The design-origin record documents this project's development. It does not claim global first-invention of AI journaling or interview-based reflection. A publication-ready [v0.1.2 release note](docs/releases/v0.1.2.md) is included; preparing it locally does not publish a GitHub Release or register a DOI.
+The design-origin record documents this project's development. It does not claim global first-invention of AI journaling or interview-based reflection. A publication-ready [v0.1.3 release note](docs/releases/v0.1.3.md) is included; preparing it locally does not publish a GitHub Release or register a DOI.
 
 ## License
 

@@ -52,7 +52,8 @@ def validate(skill_root=None):
     template = json.loads((skill / "assets" / "journal_input_template.json").read_text(encoding="utf-8"))
     validate_journal(template, {"content_revision": 0, "questions": []})
     fixture = json.loads((skill / "assets" / "demo_fixture.json").read_text(encoding="utf-8"))
-    if fixture.get("synthetic") is not True or len(fixture["answers"]) != 20 or len(fixture["deep_questions"]) != 10:
+    if (fixture.get("synthetic") is not True or len(fixture["answers"]) != 20
+            or len(fixture["basic_questions"]) != 10 or len(fixture["deep_questions"]) != 10):
         raise ValueError("合成夹具缺少标记或题目。")
     payload = copy.deepcopy(fixture["journal"])
     payload["content_revision"] = 0

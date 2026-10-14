@@ -11,10 +11,10 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.2"
+VERSION = "0.1.3"
 RELEASE_FILES = (
     ".gitignore", "README.md", "LICENSE", "CITATION.cff", "CHANGELOG.md", "requirements.txt", "docs/v0.1-requirements.md",
-    "docs/project-origin.md", "docs/releases/v0.1.2.md",
+    "docs/project-origin.md", "docs/releases/v0.1.2.md", "docs/releases/v0.1.3.md",
     "daymirror/SKILL.md", "daymirror/LICENSE", "daymirror/CITATION.cff", "daymirror/requirements.txt", "daymirror/agents/openai.yaml",
     "daymirror/references/interview.md", "daymirror/references/schema.md", "daymirror/references/privacy.md",
     "daymirror/references/provenance.md",

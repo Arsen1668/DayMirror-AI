@@ -33,3 +33,7 @@ Only product decisions and synthetic examples are included. Personal interview a
 ## Attribution and reuse
 
 Please cite [CITATION.cff](../CITATION.cff) when referencing or building on this project. Reuse is governed by the [MIT License](../LICENSE); the citation request does not add a license restriction.
+
+## Adaptive interviews — local update on 2026-10-14
+
+Further feedback found fixed openings and choices on every question too repetitive. Version 0.1.3 removes the prefilled question bank from new sessions. Both rounds now generate questions from the latest answers, using choices for the first three questions and at most the first five. Follow-ups balance the previous answer with unexplored time periods and life contexts. This is a local development milestone, not an asserted release date.

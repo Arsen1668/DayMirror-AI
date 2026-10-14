@@ -16,7 +16,7 @@
 会话包含 schema_version、session_id、date、timezone、created_at、updated_at、status、revision、content_revision、current_question、synthetic、questions、journal_payload、exports。
 
 - status 为 active、paused、completed。20 个问题均 answered/skipped 后，仍需 AI 生成总结并调用 save，才变为 completed。
-- questions 是有序 20 项，每项为 id、number、round、text、status、answer；深入问题尚未生成时 text 为 null。
+- questions 是有序 20 项，每项为 id、number、round、text、status、answer。新会话两轮所有 text 初始均为 null，AI 逐题生成并通过 question 保存；只有当前题可生成。旧会话已保存的基础题仍按原文保留。
 - current_question 为当前待回答题号，全部完成时为 null。
 - revision 是会话写入版本；content_revision 只在问题或回答变化时增加，防止旧总结覆盖新回答。
 - journal_payload 是最近保存的总结输入；修改答案后可变为过期，必须重新生成。exports 保留版本、相对文件名、完整性哈希和完成状态。
@@ -30,10 +30,10 @@
 | 命令 | 额外参数 / 输入 | 行为 |
 |---|---|---|
 | init | --timezone Asia/Shanghai | 初始化；相同时区重复调用不会清空数据 |
-| start | 可选 --date YYYY-MM-DD；--synthetic 仅供示例 | 新会话；不指定日期时按工作空间时区计算 |
+| start | 可选 --date YYYY-MM-DD；--synthetic 仅供示例 | 新会话，20 个文本为空的进度槽位；不指定日期时按工作空间时区计算 |
 | status | 可选 --session ID | 返回完整会话与当前进度 |
 | list | 无 | 列出会话摘要，不导出所有原始回答 |
-| question | --input FILE，内容为 {"question_id":"q11","text":"..."} | 保存当前深入问题，重复相同题号与文本幂等 |
+| question | --input FILE，内容为 {"question_id":"q01","text":"..."} | 两轮均可保存当前问题，文本包括当题需要的选项；重复相同题号与文本幂等 |
 | answer | --input FILE，内容为 {"question_id":"q01","answer":"用户原话"} | 回答当前题目，重复相同题号与回答幂等 |
 | skip | --question q01 | 跳过指定当前题目，重复请求幂等 |
 | edit | --number N --input FILE，内容为 {"answer":"修正后的原话"} | 修正已回答或跳过的题目，保留其他题目 |
